@@ -1,0 +1,74 @@
+<script setup>
+import { defineProps } from 'vue';
+import { Link } from '@inertiajs/vue3';
+
+// The 'printer' object we passed from the controller is available here.
+// It includes the 'status_logs' array because we loaded it.
+const props = defineProps({
+  printer: Object,
+});
+
+// Helper to format dates nicely
+const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleString();
+}
+</script>
+
+<template>
+  <div class="bg-gray-100 min-h-screen p-8">
+    <div class="max-w-7xl mx-auto">
+
+      <!-- Header -->
+      <div class="mb-6">
+        <Link :href="route('printers.index')" class="text-sm font-medium text-blue-600 hover:text-blue-800">
+          &larr; Back to All Printers
+        </Link>
+        <h1 class="text-3xl font-bold text-gray-800 mt-2">{{ printer.name }}</h1>
+      </div>
+
+      <!-- Printer Details Card -->
+      <div class="bg-white p-6 shadow-md rounded-lg mb-8">
+        <h2 class="text-xl font-semibold mb-4 text-gray-700">Printer Details</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div><span class="font-semibold">IP Address:</span> {{ printer.ip_address }}</div>
+            <div><span class="font-semibold">Model:</span> {{ printer.model || 'N/A' }}</div>
+                        <div><span class="font-semibold">site:</span> {{ printer.site  }}</div>
+
+            <div><span class="font-semibold">Location:</span> {{ printer.location || 'N/A' }}</div>
+            <div><span class="font-semibold">SNMP Community:</span> {{ printer.snmp_community }}</div>
+            <div><span class="font-semibold">Supplier Email:</span> {{ printer.supplier_email || 'N/A' }}</div>
+        </div>
+      </div>
+
+      <!-- Status History -->
+      <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <h2 class="text-xl font-semibold p-6 text-gray-700">Status History</h2>
+        <table class="min-w-full leading-normal">
+          <thead>
+            <tr>
+              <th class="px-5 py-3 border-b-2 border-t-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date Checked</th>
+              <th class="px-5 py-3 border-b-2 border-t-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+              <th class="px-5 py-3 border-b-2 border-t-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Toner Level</th>
+              <th class="px-5 py-3 border-b-2 border-t-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Drum Level</th>
+              <th class="px-5 py-3 border-b-2 border-t-2 border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Error Message</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="!printer.status_logs || printer.status_logs.length === 0">
+                <td colspan="5" class="text-center py-10 text-gray-500">No status history has been recorded for this printer.</td>
+            </tr>
+            <tr v-for="log in printer.status_logs" :key="log.id" class="border-b border-gray-200 hover:bg-gray-50">
+              <td class="px-5 py-5 bg-white text-sm"><p class="text-gray-900 whitespace-no-wrap">{{ formatDate(log.created_at) }}</p></td>
+              <td class="px-5 py-5 bg-white text-sm"><p class="text-gray-900 whitespace-no-wrap">{{ log.status }}</p></td>
+              <td class="px-5 py-5 bg-white text-sm"><p class="text-gray-900 whitespace-no-wrap">{{ log.toner_level ?? 'N/A' }}</p></td>
+              <td class="px-5 py-5 bg-white text-sm"><p class="text-gray-900 whitespace-no-wrap">{{ log.drum_level ?? 'N/A' }}</p></td>
+              <td class="px-5 py-5 bg-white text-sm"><p class="text-gray-900 whitespace-no-wrap">{{ log.error_message || 'None' }}</p></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</template>
