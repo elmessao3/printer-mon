@@ -20,6 +20,4 @@ class PrinterStatus extends Model
         'error_message',
         'last_checked_at',
     ];
-
-    public $timestamps = false;
 }

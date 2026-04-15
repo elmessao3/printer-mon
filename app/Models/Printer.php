@@ -2,33 +2,64 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany; // Import HasMany
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Printer extends Model
 {
     use HasFactory;
 
-    // ... $fillable array is here ...
     protected $fillable = [
-    'name',
-    'ip_address',
-    'model',
-    'serial_number',
-    'site',
-    'location',
-    'snmp_community',
-    'supplier_email',
-    'status',
-    'image_path',
-];
+        'name',
+        'ip_address',
+        'model',
+        'serial_number',
+        'site',
+        'location',
+        'snmp_community',
+        'supplier_email',
+        'status',
+        'image_path',
+    ];
 
-    /**
-     * Define the relationship to the printer's status logs.
-     */
+    protected $appends = ['current_status'];
+
+    /* ---------------- HISTORY ---------------- */
     public function statusLogs(): HasMany
     {
-        return $this->hasMany(PrinterStatus::class)->orderBy('created_at', 'desc');
+        return $this->hasMany(PrinterStatus::class, 'printer_id');
     }
+
+    /* ---------------- LATEST STATUS ---------------- */
+    public function latestStatus(): HasOne
+    {
+        return $this->hasOne(PrinterStatus::class, 'printer_id')
+            ->latestOfMany();
+    }
+
+    /* ---------------- FINAL STATUS (USED IN UI) ---------------- */
+    public function getCurrentStatusAttribute(): string
+{
+    // 1. DB status (FAST - main source)
+    if ($this->latestStatus?->status) {
+        return $this->latestStatus->status;
+    }
+
+    // 2. fallback (only if no DB record)
+    try {
+        $socket = @fsockopen($this->ip_address, 9100, $errno, $errstr, 1);
+
+        if ($socket) {
+            fclose($socket);
+            return 'online';
+        }
+
+        return 'offline';
+
+    } catch (\Throwable $e) {
+        return 'unknown';
+    }
+}
 }

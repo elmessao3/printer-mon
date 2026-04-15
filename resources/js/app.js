@@ -3,6 +3,7 @@ import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import '../css/app.css';
 
+
 // --- ZIGGY & ROUTE FUNCTION SETUP ---
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 // Note: The original 'route' function from Ziggy is imported but

@@ -3,45 +3,69 @@
 namespace App\Http\Controllers;
 
 use App\Models\Printer;
-use App\Services\PrinterService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Log;
 
 class PrinterController extends Controller
 {
     /**
-     * Display a listing of printers
+     * Display printers with search + status filter
      */
-    public function index()
+    public function index(Request $request)
+{
+    $query = Printer::query()
+        ->with(['latestStatus']);
+
+    /* ---------------- SEARCH ---------------- */
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('ip_address', 'like', "%{$search}%")
+              ->orWhere('serial_number', 'like', "%{$search}%")
+              ->orWhere('site', 'like', "%{$search}%");
+        });
+    }
+
+    /* ---------------- STATUS FILTER (DB ONLY) ---------------- */
+    if ($request->filled('status')) {
+        $query->whereHas('latestStatus', function ($q) use ($request) {
+            $q->where('status', $request->status);
+        });
+    }
+
+    /* ---------------- PAGINATION ---------------- */
+    $printers = $query
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
+    
+
+    return Inertia::render('Printers/Index', [
+        'printers' => $printers,
+        'filters' => $request->only(['search', 'status']),
+    ]);
+}
+    public function show(Printer $printer)
     {
-        return Inertia::render('Printers/Index', [
-            'printers' => Printer::all()
+        $printer->load([
+            'statusLogs' => function ($query) {
+                $query->orderBy('created_at', 'desc')->limit(50);
+            },
+            'latestStatus'
+        ]);
+
+        return Inertia::render('Printers/Show', [
+            'printer' => $printer
         ]);
     }
 
-    /**
-     * Fetch toner and drum status from printer
-     */
-   public function fetchPrinterStatus($ip, PrinterService $service)
-{
-    $data = $service->fetch($ip);
-
-    return response()->json($data);
-}
-
-    /**
-     * Show create printer form
-     */
     public function create()
     {
         return Inertia::render('Printers/Create');
     }
 
-    /**
-     * Store new printer
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -56,34 +80,25 @@ class PrinterController extends Controller
             'image' => 'nullable|image|max:2048',
         ]);
 
-        // Upload image
-        if ($request->hasFile('image')) {
-            $validated['image_path'] = $request
-                ->file('image')
-                ->store('printers', 'public');
-        }
-
         $validated['status'] = 'unknown';
 
         Printer::create($validated);
 
-        return Redirect::route('printers.index')
+        return redirect()->route('printers.index')
             ->with('success', 'Printer added successfully.');
     }
 
-    /**
-     * Show single printer
-     */
-    public function show(Printer $printer)
+    public function update(Request $request, Printer $printer)
     {
-        $printer->load([
-            'statusLogs' => function ($query) {
-                $query->orderBy('created_at', 'desc')->take(50);
-            }
-        ]);
+        $printer->update($request->all());
 
-        return Inertia::render('Printers/Show', [
-            'printer' => $printer
-        ]);
+        return redirect()->route('printers.show', $printer->id);
+    }
+
+    public function destroy(Printer $printer)
+    {
+        $printer->delete();
+
+        return redirect()->route('printers.index');
     }
 }

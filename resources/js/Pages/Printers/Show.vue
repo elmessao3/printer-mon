@@ -29,17 +29,47 @@ const formatDate = (dateString) => {
 
       <!-- Printer Details Card -->
       <div class="bg-white p-6 shadow-md rounded-lg mb-8">
-        <h2 class="text-xl font-semibold mb-4 text-gray-700">Printer Details</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div><span class="font-semibold">IP Address:</span> {{ printer.ip_address }}</div>
-            <div><span class="font-semibold">Model:</span> {{ printer.model || 'N/A' }}</div>
-                        <div><span class="font-semibold">site:</span> {{ printer.site  }}</div>
 
-            <div><span class="font-semibold">Location:</span> {{ printer.location || 'N/A' }}</div>
-            <div><span class="font-semibold">SNMP Community:</span> {{ printer.snmp_community }}</div>
-            <div><span class="font-semibold">Supplier Email:</span> {{ printer.supplier_email || 'N/A' }}</div>
-        </div>
-      </div>
+  <!-- Header + Buttons -->
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-xl font-semibold text-gray-700">Printer Details</h2>
+
+    <div class="flex gap-2">
+
+      <Link
+        :href="route('printers.edit', printer.id)"
+        class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+      >
+        Edit
+      </Link>
+
+      <Link
+  as="button"
+  method="delete"
+  :href="route('printers.destroy', printer.id)"
+  onclick="return confirm('Are you sure you want to delete this printer?')"
+  class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+>
+  Delete
+</Link>
+
+    </div>
+  </div>
+
+  <!-- Details Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div><span class="font-semibold">IP Address:</span> {{ printer.ip_address }}</div>
+    <div><span class="font-semibold">Model:</span> {{ printer.model || 'N/A' }}</div>
+    <div><span class="font-semibold">Site:</span> {{ printer.site || 'N/A' }}</div>
+
+    <div><span class="font-semibold">Location:</span> {{ printer.location || 'N/A' }}</div>
+    <div><span class="font-semibold">S/N:</span> {{ printer.serial_number || 'N/A' }}</div>
+    <div><span class="font-semibold">Supplier Email:</span> {{ printer.supplier_email || 'N/A' }}</div>
+
+  </div>
+
+</div>
 
       <!-- Status History -->
       <div class="bg-white shadow-md rounded-lg overflow-hidden">

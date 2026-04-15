@@ -66,3 +66,4 @@ Route::get('/snmp-full', function () {
 
 Route::get('/fetch-printer-status', [PrinterController::class, 'fetchPrinterStatus']);
 Route::get('/printer-status/{ip}', [PrinterController::class, 'fetchPrinterStatus']);
+Route::resource('printers', PrinterController::class);
