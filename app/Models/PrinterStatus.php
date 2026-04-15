@@ -18,6 +18,8 @@ class PrinterStatus extends Model
         'status',
         'error_code',
         'error_message',
-        'last_checked_at', // <-- CORRECTED FROM 'last_check'
+        'last_checked_at',
     ];
+
+    public $timestamps = false;
 }

@@ -7,11 +7,9 @@ use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\HandleInertiaRequests;
 
 return Application::configure(basePath: dirname(__DIR__))
-    ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
-        health: '/up',
-    )
+    ->withSchedule(function ($schedule) {
+    $schedule->command('printers:scan')->everyFiveMinutes();
+})
     ->withMiddleware(function (Middleware $middleware) {
         // This is the correct place to add the middleware.
         // We append it to the 'web' middleware group.
