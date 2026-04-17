@@ -1,7 +1,7 @@
 <p>Bonjour ,</p>
 
 <p>
-merci de m'envoyer toner pour l'imprimante :
+merci de m'envoyer {{ $type }} pour l'imprimante :
 </p>
 
 <p>

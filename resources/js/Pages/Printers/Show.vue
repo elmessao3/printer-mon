@@ -91,8 +91,40 @@ const formatDate = (dateString) => {
             <tr v-for="log in printer.status_logs" :key="log.id" class="border-b border-gray-200 hover:bg-gray-50">
               <td class="px-5 py-5 bg-white text-sm"><p class="text-gray-900 whitespace-no-wrap">{{ formatDate(log.created_at) }}</p></td>
               <td class="px-5 py-5 bg-white text-sm"><p class="text-gray-900 whitespace-no-wrap">{{ log.status }}</p></td>
-              <td class="px-5 py-5 bg-white text-sm"><p class="text-gray-900 whitespace-no-wrap">{{ log.toner_level ?? 'N/A' }}</p></td>
-              <td class="px-5 py-5 bg-white text-sm"><p class="text-gray-900 whitespace-no-wrap">{{ log.drum_level ?? 'N/A' }}</p></td>
+              <td class="px-5 py-5 bg-white text-sm w-48">
+  <div v-if="log.toner_level !== null" class="w-full bg-gray-200 rounded h-4">
+    <div
+      class="h-4 rounded text-xs text-white text-center"
+      :class="{
+        'bg-green-500': log.toner_level > 50,
+        'bg-yellow-500': log.toner_level <= 50 && log.toner_level > 25,
+        'bg-red-500': log.toner_level <= 25
+      }"
+      :style="{ width: log.toner_level + '%' }"
+    >
+      {{ log.toner_level }}%
+    </div>
+  </div>
+
+  <span v-else>N/A</span>
+</td>
+              <td class="px-5 py-5 bg-white text-sm w-48">
+  <div v-if="log.drum_level !== null" class="w-full bg-gray-200 rounded h-4">
+    <div
+      class="h-4 rounded text-xs text-white text-center"
+      :class="{
+        'bg-green-500': log.drum_level > 50,
+        'bg-yellow-500': log.drum_level <= 50 && log.drum_level > 25,
+        'bg-red-500': log.drum_level <= 25
+      }"
+      :style="{ width: log.drum_level + '%' }"
+    >
+      {{ log.drum_level }}%
+    </div>
+  </div>
+
+  <span v-else>N/A</span>
+</td>
               <td class="px-5 py-5 bg-white text-sm"><p class="text-gray-900 whitespace-no-wrap">{{ log.error_message || 'None' }}</p></td>
             </tr>
           </tbody>

@@ -16,7 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // 🔥 ONLY ONE SCHEDULE SYSTEM HERE
         $schedule->command('printers:check-levels')->everyFiveMinutes();
     })
-
+->withSchedule(function ($schedule) {
+        // 🔥 ONLY ONE SCHEDULE SYSTEM HERE
+        $schedule->command('printers:scan')->everyFiveMinutes();
+    })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
             HandleInertiaRequests::class,

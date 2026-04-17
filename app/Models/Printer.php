@@ -22,6 +22,8 @@ class Printer extends Model
         'supplier_email',
         'status',
         'image_path',
+        'toner_mail_status',
+        'drum_mail_status'
     ];
 
     protected $appends = ['current_status'];

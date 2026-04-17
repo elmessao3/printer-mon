@@ -31,8 +31,8 @@ class PrinterAlertService
                     ->send(new PrinterTonerAlertMail($printer, 'Toner'));
 
                 $printer->update([
-                    'toner_mail_status' => 1
-                ]);
+                        'toner_mail_status' => 1
+                ]  );
             }
 
             /* ---------------- DRUM LOW ALERT ---------------- */
@@ -48,7 +48,7 @@ class PrinterAlertService
             }
 
             /* ---------------- RESET WHEN REFILLED ---------------- */
-
+            
             if ($toner >= 95) {
 
                 $printer->update([
